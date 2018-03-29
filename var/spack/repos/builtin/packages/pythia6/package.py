@@ -22,28 +22,31 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-
+#
+# This is a template package file for Spack.  We've put "FIXME"
+# next to all the things you'll want to change. Once you've handled
+# them, you can save this file and test your package like this:
+#
+#     spack install pythia6
+#
+# You can edit this file again by typing:
+#
+#     spack edit pythia6
+#
+# See the Spack documentation for more information on packaging.
+# If you submit this package back to Spack as a pull request,
+# please first remove this boilerplate and all FIXME comments.
+#
 from spack import *
 
 
-class Hepmc(CMakePackage):
-    """The HepMC package is an object oriented, C++ event record for
-       High Energy Physics Monte Carlo generators and simulation."""
+class Pythia6(CMakePackage):
+    """The Pythia6 program can be used to generate high-energy-physics "events",
+       i.e. sets of outgoing particles produced in the interactions between two 
+       in-coming particles."""
 
-    homepage = "http://hepmc.web.cern.ch/hepmc/"
-    url      = "http://hepmc.web.cern.ch/hepmc/releases/hepmc2.06.09.tgz"
+    homepage = "https://pythia6.hepforge.org/"
+    url      = "https://github.com/alisw/pythia6/archive/428-alice1.tar.gz"
 
-    version('2.06.09', '52518437a64f6b4284e9acc2ecad6212')
-#    version('2.06.09', 'c47627ced4255b40e731b8666848b087')
-    version('2.06.08', 'a2e889114cafc4f60742029d69abd907')
-    version('2.06.07', '11d7035dccb0650b331f51520c6172e7')
-    version('2.06.06', '102e5503537a3ecd6ea6f466aa5bc4ae')
-    version('2.06.05', '2a4a2a945adf26474b8bdccf4f881d9c')
+    version('428-alice1', '8751dda1c4b5f137817876ea0d4b8a5b')
 
-    depends_on('cmake@2.6:', type='build')
-
-    def cmake_args(self):
-        return [
-            '-Dmomentum:STRING=GEV',
-            '-Dlength:STRING=MM',
-        ]
