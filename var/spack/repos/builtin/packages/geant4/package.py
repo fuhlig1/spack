@@ -41,45 +41,70 @@ class Geant4(CMakePackage):
     version('10.01.p03', '4fb4175cc0dabcd517443fbdccd97439')
 
     variant('qt', default=True, description='Enable Qt support')
+    variant('mt', default=True, description='Build multithreade libraries.')
+    variant('expat', default=True, description='Enable Expat support')
+    variant('xercesc', default=True, description='Enable Xerces-C support')
+    variant('vecgeom', default=True, description='Enable VecGeom support')
+    variant('cxx11', default=True, description='Compile using c++11 dialect.')
+    variant('cxx14', default=False, description='Compile using c++14 dialect.')
 
     depends_on('cmake@3.5:', type='build')
 
     depends_on("clhep@2.3.1.1~cxx11+cxx14", when="@10.02.p02")
-    depends_on("clhep@2.3.1.1~cxx11+cxx14", when="@10.02.p01")
+    depends_on("clhep@2.3.1.1+cxx11", when="@10.02.p01+cxx11")
+    depends_on("clhep@2.3.1.1+cxx14", when="@10.02.p01+cxx14")
     depends_on("clhep@2.2.0.4~cxx11+cxx14", when="@10.01.p03")
-    depends_on("expat")
+    depends_on("expat", when="+expat")
     depends_on("zlib")
-    depends_on("vecgeom")
-    depends_on("xerces-c")
+    depends_on("vecgeom", when="+vecgeom")
+    depends_on("xerces-c", when="+xercesc")
     depends_on("qt@4.8:", when="+qt")
 
     def cmake_args(self):
         spec = self.spec
 
         options = [
-            '-DGEANT4_USE_GDML=ON',
             '-DGEANT4_USE_SYSTEM_CLHEP=ON',
             '-DGEANT4_USE_G3TOG4=ON',
             '-DGEANT4_INSTALL_DATA=ON',
             '-DGEANT4_BUILD_TLS_MODEL=global-dynamic',
-            '-DGEANT4_BUILD_MULTITHREADED=ON',
-            '-DGEANT4_USE_USOLIDS=ON',
-            '-DGEANT4_USE_SYSTEM_EXPAT=ON',
-            '-DGEANT4_USE_SYSTEM_ZLIB=ON',
-            '-DXERCESC_ROOT_DIR:STRING=%s' %
-            spec['xerces-c'].prefix,
-            '-DUSolids_DIR=%s' %
-            join_path(spec['vecgeom'].prefix, 'lib/CMake/USolids')]
+            '-DGEANT4_USE_SYSTEM_ZLIB=ON']
 
         arch = platform.system().lower()
-        if arch is not 'darwin':
+        if arch != 'darwin':
             options.append('-DGEANT4_USE_OPENGL_X11=ON')
             options.append('-DGEANT4_USE_XM=ON')
             options.append('-DGEANT4_USE_RAYTRACER_X11=ON')
+        else:
+            options.append('-DGEANT4_USE_OPENGL_X11=OFF')
+            options.append('-DGEANT4_USE_XM=OFF')
+            options.append('-DGEANT4_USE_RAYTRACER_X11=OFF')
+
+        if "+mt" in spec:
+            options.append('-DGEANT4_BUILD_MULTITHREADED=ON')
+        else:    
+            options.append('-DGEANT4_BUILD_MULTITHREADED=OFF')
+            
+        if '+xercesc' in spec:
+            options.append('-DXERCESC_ROOT_DIR:STRING=%s' % 
+            spec['xerces-c'].prefix)
+            options.append('-DGEANT4_USE_GDML=ON')
+
+        if '+vecgeom' in spec:
+            options.append('-DUSolids_DIR=%s' %
+            join_path(spec['vecgeom'].prefix, 'lib/CMake/USolids'))
+            options.append('-DGEANT4_USE_USOLIDS=ON')
+
+        if '+expat' in spec:
+            options.append('-DGEANT4_USE_SYSTEM_EXPAT=ON')
+        else:
+            options.append('-DGEANT4_USE_SYSTEM_EXPAT=OFF')
 
         if '+cxx11' in spec:
             options.append('-DGEANT4_BUILD_CXXSTD=c++11')
-        if '+cxx14' or '+cxx1y' in spec:
+        if '+cxx14' in spec:
+            options.append('-DGEANT4_BUILD_CXXSTD=c++14')
+        if '+cxx1y' in spec:
             options.append('-DGEANT4_BUILD_CXXSTD=c++14')
 
         if '+qt' in spec:

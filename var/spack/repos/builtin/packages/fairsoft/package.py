@@ -22,23 +22,9 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install fairsoft
-#
-# You can edit this file again by typing:
-#
-#     spack edit fairsoft
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
 import platform
+import compiler
 #import os
 #import sys
 
@@ -56,17 +42,19 @@ class Fairsoft(Package):
     version('17.10', 'd3aee3525b04e1c70ccd4d5be5bf7fbf')
 
     # Add all dependencies here.
-    if self.spec.satisfies('@17.10'):
-        depends_on('cmake@3.9.4', type='build')
-        depends_on('gsl@1.16')
-        depends_on('googletest@1.7.0')
+    depends_on('cmake@3.9.4', type='build')
+    depends_on('gsl@1.16')
+    depends_on('googletest@1.7.0')
 
-        depends_on('boost@1.64.0 clanglibcpp=True', when=(platform == 'darwin'))
-        depends_on('boost@1.64.0', when=(platform != 'darwin'))
+    depends_on('boost@1.64.0 clanglibcpp=True', when=(platform == 'darwin'))
+    depends_on('boost@1.64.0', when=(platform != 'darwin'))
 
-        depends_on('pythia6@428-alice1')
-        depends_on('hepmc')
+    depends_on('pythia6@428-alice1')
+    depends_on('hepmc@2.06.09')     # also required for pythia8, so duplicate here 
+    depends_on('pythia8@8212')
 
+#    'c++11' in compiler.flags['cxxflags']    
+    depends_on('geant4@10.02.p01~qt+cxx11~xercesc~vecgeom~expat~mt')   # check if c++11 or c++14 is in CXXFLAGS to build Geant4 accordingly
 
     def install(self, spec, prefix):
         # touch a file in the installation directory
