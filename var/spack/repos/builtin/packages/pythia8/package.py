@@ -22,21 +22,6 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install pythia8
-#
-# You can edit this file again by typing:
-#
-#     spack edit pythia8
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
 
 
@@ -54,13 +39,15 @@ class Pythia8(AutotoolsPackage):
 
     depends_on('hepmc@2.06.09')
 
-#    def configure_args(self):
-#        spec = self.spec
-#        args = ['--with-hepmc2=%s' % spec['hepmc'].prefix,
-#                '--enable-shared']
-#        return args
+    def configure_args(self):
+        spec = self.spec
+        cfl = ' '.join(self.compiler.flags['cxxflags'])
 
-#    def setup_environment(self, spack_env, run_env):
-#        run_env.set('PYTHIA8DATA', '%s/share/Pythia8/xmldoc' % prefix )
-#        run_env.set('PYTHIA8', '%s' % prefix )
-#                '--cxx-common=%s' % compiler.flags['cxxflags'],
+        args = ['--with-hepmc2=%s' % spec['hepmc'].prefix,
+                '--cxx-common=%s' % cfl,
+                '--enable-shared']
+        return args
+
+    def setup_environment(self, spack_env, run_env):
+        run_env.set('PYTHIA8DATA', '%s/share/Pythia8/xmldoc' % prefix )
+        run_env.set('PYTHIA8', '%s' % prefix )
